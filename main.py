@@ -1,7 +1,7 @@
 import pygame
 import numpy as np
 
-from function.pane import BoardRect
+from function.pane import BoardRect, HorizontalBoardSliderRect
 
 
 class OmokPan:
@@ -9,13 +9,7 @@ class OmokPan:
         self.size = size
         self.pan = np.zeros(size, dtype=np.uint8)
         self.turn_now = 1
-        pad = 6
-        spacing = 10
-        self.board_rects = [BoardRect(pad + z * (20 * 14 + spacing), pad * 4, self.size[1:], (20, 20))
-                            for z in range(self.size[0])]
-
-        # using in to be functional
-        self.moving: int = None
+        self.horizontal_slide = HorizontalBoardSliderRect(self.size, (0, 20), 1600)
 
     def pass_turn(self):
         if self.turn_now == 1:
@@ -127,9 +121,10 @@ class OmokPan:
         # self.pan = np.zeros(self.size, dtype=np.uint8)
 
     def on_event(self, event):
+        self.horizontal_slide.on_event(event)
         if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
             mouse = pygame.mouse.get_pos()
-            for z, b in enumerate(self.board_rects):
+            for z, b in enumerate(self.horizontal_slide.board_rects):
                 t = b.collide(mouse)
                 if t:
                     x, y = b.collide_cell(mouse)
@@ -138,33 +133,10 @@ class OmokPan:
                     return True
             else:
                 return False
-        elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 3:
-            if self.moving is None:
-                mouse = pygame.mouse.get_pos()
-                for z, b in enumerate(self.board_rects):
-                    t = b.collide(mouse)
-                    if t:
-                        self.moving = z
-                        break
-                else:
-                    return False
-
-        elif event.type == pygame.MOUSEBUTTONUP and event.button == 3:
-            if not (self.moving is None):
-                self.moving = None
-
-
-        elif event.type == pygame.MOUSEMOTION:
-            if event.buttons[2]:
-                if not (self.moving is None):
-                    self.board_rects[self.moving].move_absolute(pygame.mouse.get_pos())
 
     def draw_all(self, surface):
-        self.draw_grid(surface)
+        self.horizontal_slide.draw_boards_grid(surface)
         self.draw_cell(surface)
-
-    def draw_grid(self, surface):
-        [b.draw(surface) for b in self.board_rects]
 
     def draw_cell(self, surface):
         for z in range(pan.size[0]):
@@ -174,9 +146,9 @@ class OmokPan:
                     if t == 0:
                         pass
                     elif t == 1:
-                        pygame.draw.rect(surface, (0, 0, 0), self.board_rects[z].get_rect(x, y), 0)
+                        pygame.draw.rect(surface, (0, 0, 0), self.horizontal_slide.get_rect(z, x, y), 0)
                     elif t == 2:
-                        pygame.draw.rect(surface, (255, 255, 255), self.board_rects[z].get_rect(x, y), 0)
+                        pygame.draw.rect(surface, (255, 255, 255), self.horizontal_slide.get_rect(z, x, y), 0)
                     else:
                         pass
 

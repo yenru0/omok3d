@@ -38,6 +38,56 @@ class BoardRect:
     def offset(self, pos):
         return pos[0] - self.boardrect.x, pos[1] - self.boardrect.y
 
+    def slide(self, x):
+        self.boardrect.move_ip(x, 0)
+        for row in self.cellrects:
+            for cell in row:
+                cell.move_ip(x, 0)
+
+
+class HorizontalBoardSliderRect:
+    def __init__(self, size, pos, width, padding=(50, 20), slide_range=(0, 1000)):
+
+        self.z = size[0]
+        self.slider_rect = pygame.Rect(pos, (width, 320))
+        self.slide_range = slide_range
+        start_pos_x = (width - 2 * padding[0]) / self.z
+
+        self.board_rects = [BoardRect(int(padding[0] + start_pos_x * z), pos[1] + padding[1], size[1:], (20, 20)) for z
+                            in
+                            range(self.z)]
+
+        self.slide_before_pos = (0, 0)
+
+    def on_event(self, event):
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            if event.button == 3:
+                self.slide_before_pos = pygame.mouse.get_pos()
+        elif event.type == pygame.MOUSEMOTION:
+            if event.buttons[2]:
+                mouse = pygame.mouse.get_pos()
+                if self.slider_rect.collidepoint(mouse):
+                    self.slide(mouse[0] - self.slide_before_pos[0])
+                    self.slide_before_pos = mouse
+
+    def slide(self, x):
+        if self.slider_rect.topright[0] + x < self.slide_range[1] or \
+                self.slider_rect.topleft[0] + x > self.slide_range[0]:
+            return
+        self.slider_rect.move_ip(x, 0)
+        for b in self.board_rects:
+            b.slide(x)
+
+    def draw_boards_grid(self, surface):
+        pygame.draw.rect(surface, (0, 0, 255), self.slider_rect, 1, 1)
+        [b.draw(surface) for b in self.board_rects]
+
+    def get_board(self, z):
+        return self.board_rects[z]
+
+    def get_rect(self, z, x, y):
+        return self.get_board(z).get_rect(x, y)
+
 
 """
 import pygame
