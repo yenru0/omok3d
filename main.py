@@ -156,32 +156,34 @@ class OmokPan:
         pygame.draw.line(surface, (0, 0, 255),
                          self.horizontal_slide.slider_rect.midtop, self.horizontal_slide.slider_rect.midbottom)
 
-pygame.init()
 
-RESOLUTION = (1000, 560)
+if __name__ == '__main__':
+    pygame.init()
 
-screen = pygame.display.set_mode((1000, 560), pygame.DOUBLEBUF)
-clock = pygame.time.Clock()
+    RESOLUTION = (1000, 560)
 
-SIZE = (5, 13, 13)
+    screen = pygame.display.set_mode((1000, 560), pygame.DOUBLEBUF)
+    clock = pygame.time.Clock()
 
-pan = OmokPan(SIZE)
+    SIZE = (5, 13, 13)
+    
+    pan = OmokPan(SIZE)
 
-DONE = False
-DEBUG = True
-while not DONE:
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            DONE = True
-        if pan.on_event(event):
-            pass
+    DONE = False
+    DEBUG = True
+    while not DONE:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                DONE = True
+            if pan.on_event(event):
+                pass
 
-    screen.fill((180, 100, 60))
+        screen.fill((180, 100, 60))
 
-    pan.draw_all(screen)
-    if DEBUG:
-        pygame.draw.line(screen, (255, 0, 0), (RESOLUTION[0]//2, 0), (RESOLUTION[0]//2, RESOLUTION[1]), 1)
-        pan.draw_debug(screen)
-    pygame.display.flip()
-    clock.tick(60)
-pygame.quit()
+        pan.draw_all(screen)
+        if DEBUG:
+            pygame.draw.line(screen, (255, 0, 0), (RESOLUTION[0] // 2, 0), (RESOLUTION[0] // 2, RESOLUTION[1]), 1)
+            pan.draw_debug(screen)
+        pygame.display.flip()
+        clock.tick(60)
+    pygame.quit()
