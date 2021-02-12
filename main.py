@@ -9,7 +9,7 @@ class OmokPan:
         self.size = size
         self.pan = np.zeros(size, dtype=np.uint8)
         self.turn_now = 1
-        self.horizontal_slide = HorizontalBoardSliderRect(self.size, (0, 20), 1600)
+        self.horizontal_slide = HorizontalBoardSliderRect(self.size, (0, 20), 1600, slide_range=(0, RESOLUTION[0]))
 
     def pass_turn(self):
         if self.turn_now == 1:
@@ -152,8 +152,13 @@ class OmokPan:
                     else:
                         pass
 
+    def draw_debug(self, surface):
+        pygame.draw.line(surface, (0, 0, 255),
+                         self.horizontal_slide.slider_rect.midtop, self.horizontal_slide.slider_rect.midbottom)
 
 pygame.init()
+
+RESOLUTION = (1000, 560)
 
 screen = pygame.display.set_mode((1000, 560), pygame.DOUBLEBUF)
 clock = pygame.time.Clock()
@@ -163,7 +168,7 @@ SIZE = (5, 13, 13)
 pan = OmokPan(SIZE)
 
 DONE = False
-
+DEBUG = True
 while not DONE:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -174,7 +179,9 @@ while not DONE:
     screen.fill((180, 100, 60))
 
     pan.draw_all(screen)
-
+    if DEBUG:
+        pygame.draw.line(screen, (255, 0, 0), (RESOLUTION[0]//2, 0), (RESOLUTION[0]//2, RESOLUTION[1]), 1)
+        pan.draw_debug(screen)
     pygame.display.flip()
     clock.tick(60)
 pygame.quit()
