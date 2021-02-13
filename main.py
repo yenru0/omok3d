@@ -137,6 +137,7 @@ class OmokPan:
     def draw_all(self, surface):
         self.horizontal_slide.draw_boards_grid(surface)
         self.horizontal_slide.draw_axis(surface)
+        self.horizontal_slide.draw_guide(surface)
         self.draw_cell(surface)
 
     def draw_cell(self, surface):

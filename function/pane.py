@@ -130,6 +130,19 @@ class HorizontalBoardSliderRect:
         for i in range(self.z):
             surface.blit(self.font_axis_z_surfaces[i], self.font_axis_z_rects[i])
 
+    def draw_guide(self, surface):
+        mouse = pygame.mouse.get_pos()
+        for z, b in enumerate(self.board_rects):
+            t = b.collide(mouse)
+            if t:
+                x, y = b.collide_cell(mouse)
+                break
+        else:
+            return
+        if t:
+            for z in range(self.z):
+                pygame.draw.rect(surface, (40, 160, 40), self.get_rect(z, x, y))
+
     def get_board(self, z):
         return self.board_rects[z]
 
