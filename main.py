@@ -9,7 +9,7 @@ class OmokPan:
         self.size = size
         self.pan = np.zeros(size, dtype=np.uint8)
         self.turn_now = 1
-        self.horizontal_slide = HorizontalBoardSliderRect(self.size, (0, 20), 1600, slide_range=(0, RESOLUTION[0]))
+        self.horizontal_slide = HorizontalBoardSliderRect(self.size, (0, 20), 1600, 340, slide_range=(0, RESOLUTION[0]))
 
     def pass_turn(self):
         if self.turn_now == 1:
@@ -136,6 +136,7 @@ class OmokPan:
 
     def draw_all(self, surface):
         self.horizontal_slide.draw_boards_grid(surface)
+        self.horizontal_slide.draw_axis(surface)
         self.draw_cell(surface)
 
     def draw_cell(self, surface):
@@ -146,15 +147,24 @@ class OmokPan:
                     if t == 0:
                         pass
                     elif t == 1:
-                        pygame.draw.rect(surface, (0, 0, 0), self.horizontal_slide.get_rect(z, x, y), 0)
+                        pygame.draw.circle(surface, (0, 0, 0), self.horizontal_slide.get_rect(z, x, y).center, 7)
                     elif t == 2:
-                        pygame.draw.rect(surface, (255, 255, 255), self.horizontal_slide.get_rect(z, x, y), 0)
+                        pygame.draw.circle(surface, (255, 255, 255), self.horizontal_slide.get_rect(z, x, y).center, 7)
                     else:
                         pass
 
     def draw_debug(self, surface):
         pygame.draw.line(surface, (0, 0, 255),
                          self.horizontal_slide.slider_rect.midtop, self.horizontal_slide.slider_rect.midbottom)
+
+        pygame.draw.line(surface, (0, 0, 255),
+                         (self.horizontal_slide.slider_rect.topleft[0],
+                          self.horizontal_slide.slider_rect.topleft[1] + self.horizontal_slide.padding[1]),
+                         (self.horizontal_slide.slider_rect.topright[0],
+                          self.horizontal_slide.slider_rect.topright[1] + self.horizontal_slide.padding[1])
+                         )
+        for i in range(self.size[0]):
+            pygame.draw.rect(surface, (0, 255, 0), self.horizontal_slide.font_axis_z_rects[i], 1)
 
 
 if __name__ == '__main__':
@@ -166,11 +176,11 @@ if __name__ == '__main__':
     clock = pygame.time.Clock()
 
     SIZE = (5, 13, 13)
-    
+
     pan = OmokPan(SIZE)
 
     DONE = False
-    DEBUG = True
+    DEBUG = not True
     while not DONE:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
